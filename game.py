@@ -1,6 +1,6 @@
 import numpy as np
 import random
-#from ia import PVIA_optins(dificuldade)
+from ia import PVIA as ia_PVIA
 
 
 class Jogo():
