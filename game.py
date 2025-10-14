@@ -134,9 +134,68 @@ class Jogo():
         return resultado        
     
     def PVIA(self, dificuldade):
-        #PVIA_optins(dificuldade)  
-        #faz a lógica aqui dai
-        pass
+        fim_de_jogo = False
+        turno = 0
+        resultado = None
+        tempo_total = 0.0
+
+        self.mostrar_tabuleiro()
+
+        while not fim_de_jogo:
+            if turno == 0:
+                # player move
+                mov_valido = False
+                while not mov_valido:
+                    jogada = input("Escolha uma coluna: ").upper()
+                    if jogada in self.teclas:
+                        coluna = self.teclas[jogada]
+                        if self.movimento_valido(coluna):
+                            linha = self.proxima_linha_disponivel(coluna)
+                            self.colocar_peca(linha, coluna, self.posicao_vermelha)
+                            mov_valido = True
+                        else:
+                            print("Coluna cheia! Escolha outra.")
+                    else:
+                        print("Tecla inválida! Use A-G.")
+
+                if self.checar_vitoria(self.posicao_vermelha):
+                    self.mostrar_tabuleiro()
+                    resultado = 'Jogador Vermelho venceu!'
+                    fim_de_jogo = True
+
+            else:
+                col, elapsed = ia_PVIA(dificuldade, self.tabuleiro, self.posicao_vermelha, self.posicao_amarela)
+                tempo_total += elapsed
+                if col is None:
+                    # no valid moves
+                    resultado = 'Empate!'
+                    fim_de_jogo = True
+                else:
+                    if self.movimento_valido(col):
+                        linha = self.proxima_linha_disponivel(col)
+                        self.colocar_peca(linha, col, self.posicao_amarela)
+                    else:
+                        # fallback to random valid move
+                        valid = [c for c in range(self.colunas) if self.movimento_valido(c)]
+                        if valid:
+                            c = random.choice(valid)
+                            linha = self.proxima_linha_disponivel(c)
+                            self.colocar_peca(linha, c, self.posicao_amarela)
+
+                if self.checar_vitoria(self.posicao_amarela):
+                    self.mostrar_tabuleiro()
+                    resultado = 'Jogador Amarelo venceu!'
+                    fim_de_jogo = True
+
+            self.mostrar_tabuleiro()
+            turno = 1 - turno
+
+            # Checar empate
+            if not any(self.movimento_valido(c) for c in range(self.colunas)):
+                resultado = 'Empate!'
+                fim_de_jogo = True
+
+        return resultado, tempo_total
 
 
 def jogar():
