@@ -68,9 +68,9 @@ def avaliar_janela_iniciante(janela, peca_ia):
     score = 0
     peca_humano = "X" if peca_ia == "0" else "0"
 
-    if janela.count(peca_ia) == 3 and janela.count(" ") == 1:#
+    if janela.count(peca_ia) == 3 and janela.count(" ") == 1:
         score += 1
-    if janela.count(peca_humano) == 3 and janela.count(" ") == 1:#
+    if janela.count(peca_humano) == 3 and janela.count(" ") == 1:
         score -= 10
     return score
 
@@ -162,7 +162,11 @@ def pontuacao_tabuleiro(tabuleiro, peca_ia, funcao_avaliacao):
 
 # parte max do minimax, tenta maximizar o valor da ia
 def max_value(tabuleiro, depth, max_depth, peca_ia, heuristica):
-    # para se chegou no fim do jogo ou na profundidade maxima
+    peca_humano = "X" if peca_ia == "0" else "0"
+    if checar_vitoria(tabuleiro, peca_ia): 
+        return 1000000 
+    if checar_vitoria(tabuleiro, peca_humano): 
+        return -1000000
     if checar_fim(tabuleiro) or depth == max_depth:
         return pontuacao_tabuleiro(tabuleiro, peca_ia, heuristica)
 
@@ -174,12 +178,17 @@ def max_value(tabuleiro, depth, max_depth, peca_ia, heuristica):
         )
     return valor
 
-# parte min do minimax, tenta minimizar o valor pro humano
+# parte min do minimax, tenta minimizar o valor pro humano, e minimizar pra ia
 def min_value(tabuleiro, depth, max_depth, peca_ia, heuristica):
+    peca_humano = "X" if peca_ia == "0" else "0"
+    if checar_vitoria(tabuleiro, peca_ia): 
+        return 1000000
+    if checar_vitoria(tabuleiro, peca_humano): 
+        return -1000000
     if checar_fim(tabuleiro) or depth == max_depth:
         return pontuacao_tabuleiro(tabuleiro, peca_ia, heuristica)
 
-    peca_humano = "X" if peca_ia == "0" else "0"
+    
     valor = np.inf
     for col in movimentos_validos(tabuleiro):
         novo_tabuleiro = simular_jogada(tabuleiro, col, peca_humano)
