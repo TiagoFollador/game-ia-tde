@@ -144,7 +144,7 @@ class Jogo():
 
         if dificuldade == 1:
             dificuldade_escolhida = avaliar_janela_iniciante
-            profundidade_max = 3
+            profundidade_max = 2
         elif dificuldade == 2:
             dificuldade_escolhida = avaliar_janela_intermediaria
             profundidade_max = 6

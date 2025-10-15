@@ -88,7 +88,7 @@ def avaliar_janela_intermediaria(janela, peca_ia):
     return score
 
 def avaliar_janela_avancada(janela, peca_ia):
-    # Pode ser implementada futuramente
+    #tem que implementar ainda
     return 0
 
 def pontuacao_tabuleiro(tabuleiro, peca_ia, funcao_avaliacao):
