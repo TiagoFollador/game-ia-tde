@@ -2,7 +2,7 @@ import numpy as np
 import random
 from ia import *
 
-
+# classe principal do jogo
 class Jogo:
     def __init__(self):
         self.linhas = 6
@@ -16,28 +16,34 @@ class Jogo:
 
         self.tabuleiro = self.criar_tabuleiro()
 
+    # cria um tabuleiro vazio 6x7
     def criar_tabuleiro(self):
         return np.full((self.linhas, self.colunas), self.posicao_vazia)
 
+    # imprime o tabuleiro na tela
     def mostrar_tabuleiro(self):
-        print("\n   A S D F G H J")
+        print("\n   0 1 2 3 4 5 6")
         for n, linha in enumerate(self.tabuleiro):
             print(f"{n} ", " ".join(linha), f" {n}")
         print("\n   A S D F G H J")
         print("-----------------------------------------")
 
+    # checa se a coluna ainda tem espaco
     def movimento_valido(self, coluna):
         return self.tabuleiro[0, coluna] == self.posicao_vazia
 
+    # acha a proxima linha vazia na coluna
     def proxima_linha_disponivel(self, coluna):
         for l in range(self.linhas - 1, -1, -1):
             if self.tabuleiro[l, coluna] == self.posicao_vazia:
                 return l
         return None
 
+    # coloca a peca no tabuleiro
     def colocar_peca(self, linha, coluna, peca):
         self.tabuleiro[linha, coluna] = peca
 
+    # verifica se alguem ganhou
     def checar_vitoria(self, peca):
         # Checar horizontal
         for l in range(self.linhas):
@@ -65,12 +71,14 @@ class Jogo:
 
         return False
 
+    # ve se deu empate (tabuleiro cheio)
     def checar_empate(self, resultado, fim_de_jogo):
         if not any(self.movimento_valido(c) for c in range(self.colunas)):
             resultado = "Empate!"
             fim_de_jogo = True
         return resultado, fim_de_jogo
 
+    # modo jogador vs jogador
     def PVP(self):
         resultado = None
         fim_de_jogo = False
@@ -113,7 +121,7 @@ class Jogo:
                         else:
                             print("Coluna cheia! Escolha outra.")
                     else:
-                        print("Tecla inválida! Use A-G.")
+                        print("Tecla inválida! Use A-J.")
 
                 if self.checar_vitoria(self.posicao_amarela):
                     self.mostrar_tabuleiro()
@@ -127,21 +135,23 @@ class Jogo:
 
         print(f"Resultado: {resultado}")
 
+    # modo jogador vs ia
     def PVIA(self, dificuldade):
         fim_de_jogo = False
         turno = 0
         resultado = None
         tempo_total = 0.0
 
+        # escolhe a funcao de avaliacao e profundidade baseado na dificuldade
         if dificuldade == 1:
             dificuldade_escolhida = avaliar_janela_iniciante
             profundidade_max = 2
         elif dificuldade == 2:
             dificuldade_escolhida = avaliar_janela_intermediaria
-            profundidade_max = 6
+            profundidade_max = 4
         elif dificuldade == 3:
             dificuldade_escolhida = avaliar_janela_avancada
-            profundidade_max = 8
+            profundidade_max = 6
         else:
             dificuldade_escolhida = avaliar_janela_iniciante
             profundidade_max = 2
@@ -165,7 +175,7 @@ class Jogo:
                         else:
                             print("Coluna cheia! Escolha outra.")
                     else:
-                        print("Tecla inválida! Use A-G.")
+                        print("Tecla inválida! Use A-J.")
 
                 if self.checar_vitoria(self.posicao_vermelha):
                     self.mostrar_tabuleiro()
@@ -197,7 +207,7 @@ class Jogo:
 
         print(f"Resultado: {resultado}")
 
-
+# funcao principal pra iniciar o jogo
 def jogar():
     jogo = Jogo()
     tabuleiro = jogo.tabuleiro
