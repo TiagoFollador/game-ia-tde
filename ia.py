@@ -199,7 +199,6 @@ def min_value(tabuleiro, depth, max_depth, peca_ia, heuristica):
 
 # algoritmo minimax pra achar a melhor jogada
 def minimax(tabuleiro, depth, max_depth, peca_ia, heuristica):
-    """Função minimax que retorna a melhor coluna e o valor associado."""
     melhor_valor = -np.inf
     melhor_coluna = None
 
