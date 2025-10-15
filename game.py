@@ -1,26 +1,18 @@
 import numpy as np
 import random
-from ia import * 
+from ia import *
 
 
-class Jogo():
+class Jogo:
     def __init__(self):
         self.linhas = 6
         self.colunas = 7
 
-        self.posicao_vazia = ' '
-        self.posicao_vermelha = 'X'  
-        self.posicao_amarela = '0' 
+        self.posicao_vazia = " "
+        self.posicao_vermelha = "X"
+        self.posicao_amarela = "0"
 
-        self.teclas = {
-            'A': 0,
-            'S': 1,
-            'D': 2,
-            'F': 3,
-            'G': 4,
-            'H': 5,
-            'J': 6
-        }
+        self.teclas = {"A": 0, "S": 1, "D": 2, "F": 3, "G": 4, "H": 5, "J": 6}
 
         self.tabuleiro = self.criar_tabuleiro()
 
@@ -30,7 +22,7 @@ class Jogo():
     def mostrar_tabuleiro(self):
         print("\n   A S D F G H J")
         for n, linha in enumerate(self.tabuleiro):
-            print(f'{n} ', ' '.join(linha), f' {n}')
+            print(f"{n} ", " ".join(linha), f" {n}")
         print("\n   A S D F G H J")
         print("-----------------------------------------")
 
@@ -38,7 +30,7 @@ class Jogo():
         return self.tabuleiro[0, coluna] == self.posicao_vazia
 
     def proxima_linha_disponivel(self, coluna):
-        for l in range(self.linhas-1, -1, -1):
+        for l in range(self.linhas - 1, -1, -1):
             if self.tabuleiro[l, coluna] == self.posicao_vazia:
                 return l
         return None
@@ -49,33 +41,33 @@ class Jogo():
     def checar_vitoria(self, peca):
         # Checar horizontal
         for l in range(self.linhas):
-            for c in range(self.colunas-3):
-                if all(self.tabuleiro[l, c+i] == peca for i in range(4)):
+            for c in range(self.colunas - 3):
+                if all(self.tabuleiro[l, c + i] == peca for i in range(4)):
                     return True
 
         # Checar vertical
         for c in range(self.colunas):
-            for l in range(self.linhas-3):
-                if all(self.tabuleiro[l+i, c] == peca for i in range(4)):
+            for l in range(self.linhas - 3):
+                if all(self.tabuleiro[l + i, c] == peca for i in range(4)):
                     return True
 
         # Checar diagonal /
         for l in range(3, self.linhas):
-            for c in range(self.colunas-3):
-                if all(self.tabuleiro[l-i, c+i] == peca for i in range(4)):
+            for c in range(self.colunas - 3):
+                if all(self.tabuleiro[l - i, c + i] == peca for i in range(4)):
                     return True
 
         # Checar diagonal \
-        for l in range(self.linhas-3):
-            for c in range(self.colunas-3):
-                if all(self.tabuleiro[l+i, c+i] == peca for i in range(4)):
+        for l in range(self.linhas - 3):
+            for c in range(self.colunas - 3):
+                if all(self.tabuleiro[l + i, c + i] == peca for i in range(4)):
                     return True
 
         return False
 
     def checar_empate(self, resultado, fim_de_jogo):
         if not any(self.movimento_valido(c) for c in range(self.colunas)):
-            resultado = 'Empate!'
+            resultado = "Empate!"
             fim_de_jogo = True
         return resultado, fim_de_jogo
 
@@ -86,7 +78,6 @@ class Jogo():
 
         self.mostrar_tabuleiro()
 
-
         while not fim_de_jogo:
             if turno == 0:
                 mov_valido = False
@@ -95,8 +86,8 @@ class Jogo():
                     if jogada in self.teclas:
                         coluna = self.teclas[jogada]
                         if self.movimento_valido(coluna):
-                            linha = self.proxima_linha_disponivel( coluna)
-                            self.colocar_peca( linha, coluna, self.posicao_vermelha)
+                            linha = self.proxima_linha_disponivel(coluna)
+                            self.colocar_peca(linha, coluna, self.posicao_vermelha)
                             mov_valido = True
                         else:
                             print("Coluna cheia! Escolha outra.")
@@ -105,7 +96,7 @@ class Jogo():
 
                 if self.checar_vitoria(self.posicao_vermelha):
                     self.mostrar_tabuleiro()
-                    resultado = 'Jogador Vermelho venceu!'
+                    resultado = "Jogador Vermelho venceu!"
                     fim_de_jogo = True
 
             else:
@@ -126,7 +117,7 @@ class Jogo():
 
                 if self.checar_vitoria(self.posicao_amarela):
                     self.mostrar_tabuleiro()
-                    resultado = 'Jogador Amarelo venceu!'
+                    resultado = "Jogador Amarelo venceu!"
                     fim_de_jogo = True
 
             self.mostrar_tabuleiro()
@@ -134,8 +125,8 @@ class Jogo():
 
             resultado, fim_de_jogo = self.checar_empate(resultado, fim_de_jogo)
 
-        print(f"Resultado: {resultado}")        
-    
+        print(f"Resultado: {resultado}")
+
     def PVIA(self, dificuldade):
         fim_de_jogo = False
         turno = 0
@@ -148,9 +139,12 @@ class Jogo():
         elif dificuldade == 2:
             dificuldade_escolhida = avaliar_janela_intermediaria
             profundidade_max = 6
-
+        elif dificuldade == 3:
+            dificuldade_escolhida = avaliar_janela_avancada
+            profundidade_max = 8
         else:
-            dificuldade_escolhida = ""
+            dificuldade_escolhida = avaliar_janela_iniciante
+            profundidade_max = 2
 
         self.mostrar_tabuleiro()
 
@@ -162,7 +156,11 @@ class Jogo():
                     if jogada in self.teclas:
                         coluna = self.teclas[jogada]
                         if self.movimento_valido(coluna):
-                            self.colocar_peca(self.proxima_linha_disponivel(coluna), coluna, self.posicao_vermelha)
+                            self.colocar_peca(
+                                self.proxima_linha_disponivel(coluna),
+                                coluna,
+                                self.posicao_vermelha,
+                            )
                             mov_valido = True
                         else:
                             print("Coluna cheia! Escolha outra.")
@@ -171,17 +169,25 @@ class Jogo():
 
                 if self.checar_vitoria(self.posicao_vermelha):
                     self.mostrar_tabuleiro()
-                    resultado = 'Jogador Vermelho venceu!'
+                    resultado = "Jogador Vermelho venceu!"
                     fim_de_jogo = True
 
             else:
-                coluna, valor = minimax(self.tabuleiro, depth=1, max_depth=profundidade_max, peca_ia='0', heuristica=dificuldade_escolhida)
+                coluna, valor = minimax(
+                    self.tabuleiro,
+                    depth=1,
+                    max_depth=profundidade_max,
+                    peca_ia="0",
+                    heuristica=dificuldade_escolhida,
+                )
                 print(f"Melhor coluna: {coluna}, Valor: {valor}")
-                self.colocar_peca(self.proxima_linha_disponivel(coluna), coluna, self.posicao_amarela)
+                self.colocar_peca(
+                    self.proxima_linha_disponivel(coluna), coluna, self.posicao_amarela
+                )
 
                 if self.checar_vitoria(self.posicao_amarela):
                     self.mostrar_tabuleiro()
-                    resultado = 'Jogador Amarelo venceu!'
+                    resultado = "Jogador Amarelo venceu!"
                     fim_de_jogo = True
 
             self.mostrar_tabuleiro()
@@ -189,8 +195,8 @@ class Jogo():
 
             resultado, fim_de_jogo = self.checar_empate(resultado, fim_de_jogo)
 
-        
         print(f"Resultado: {resultado}")
+
 
 def jogar():
     jogo = Jogo()
@@ -202,13 +208,15 @@ def jogar():
         entrada = input("Qual modo de jogo deseja jogar? ")
         if entrada.isdigit():
             modo_de_jogo = int(entrada)
-            if modo_de_jogo == 1: 
+            if modo_de_jogo == 1:
                 jogo.PVP()
                 break
-            if  modo_de_jogo == 2:
+            if modo_de_jogo == 2:
                 while True:
-                    dificuldade = int(input("Qual dificuldade deseja jogar?"))
-                    if dificuldade in [1,2,3]:
+                    dificuldade = int(
+                        input("Qual dificuldade deseja jogar (1, 2 ou 3)?")
+                    )
+                    if dificuldade in [1, 2, 3]:
                         jogo.PVIA(dificuldade)
                         break
                     else:
@@ -220,4 +228,3 @@ def jogar():
 
 if __name__ == "__main__":
     jogar()
-

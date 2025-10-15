@@ -37,27 +37,27 @@ def checar_vitoria(tabuleiro, peca):
 def movimentos_validos(tabuleiro):
     colunas_validas = []
     for c in range(tabuleiro.shape[1]):
-        if tabuleiro[0][c] == ' ':
+        if tabuleiro[0][c] == " ":
             colunas_validas.append(c)
     return colunas_validas
 
 
 def simular_jogada(tabuleiro, coluna, peca):
-    novo_tabuleiro = copy.deepcopy(tabuleiro) #copia um tabuleiro
+    novo_tabuleiro = copy.deepcopy(tabuleiro)  # copia um tabuleiro
     for l in range(linhas - 1, -1, -1):
-        if novo_tabuleiro[l][coluna] == ' ':
-            novo_tabuleiro[l][coluna] = peca #simula a peça nesse tabuleiro novo
+        if novo_tabuleiro[l][coluna] == " ":
+            novo_tabuleiro[l][coluna] = peca  # simula a peça nesse tabuleiro novo
             break
     return novo_tabuleiro
 
 
 def checar_fim(tabuleiro):
-    if checar_vitoria(tabuleiro, 'X') or checar_vitoria(tabuleiro, '0'):
+    if checar_vitoria(tabuleiro, "X") or checar_vitoria(tabuleiro, "0"):
         return True
 
-    #checa se tem empata
+    # checa se tem empata
     movimentos = movimentos_validos(tabuleiro)
-    if not movimentos:  
+    if not movimentos:
         return True
 
     return False
@@ -65,31 +65,66 @@ def checar_fim(tabuleiro):
 
 def avaliar_janela_iniciante(janela, peca_ia):
     score = 0
-    peca_humano = 'X' if peca_ia == '0' else '0'
+    peca_humano = "X" if peca_ia == "0" else "0"
 
-    if janela.count(peca_ia) == 3 and janela.count(' ') == 1:
+    if janela.count(peca_ia) == 3 and janela.count(" ") == 1:
         score += 1
-    if janela.count(peca_humano) == 3 and janela.count(' ') == 1:
+    if janela.count(peca_humano) == 3 and janela.count(" ") == 1:
         score -= 10
     return score
 
+
 def avaliar_janela_intermediaria(janela, peca_ia):
     score = 0
-    peca_humano = 'X' if peca_ia == '0' else '0'
+    peca_humano = "X" if peca_ia == "0" else "0"
 
     if janela.count(peca_ia) == 4:
         score += 100
-    elif janela.count(peca_ia) == 3 and janela.count(' ') == 1:
+    elif janela.count(peca_ia) == 3 and janela.count(" ") == 1:
         score += 50
-    elif janela.count(peca_ia) == 2 and janela.count(' ') == 2:
+    elif janela.count(peca_ia) == 2 and janela.count(" ") == 2:
         score += 10
-    if janela.count(peca_humano) == 3 and janela.count(' ') == 1:
+    if janela.count(peca_humano) == 3 and janela.count(" ") == 1:
         score -= 80
     return score
 
+
 def avaliar_janela_avancada(janela, peca_ia):
-    #tem que implementar ainda
-    return 0
+    score = 0
+    peca_humano = "X" if peca_ia == "0" else "0"
+
+    count_ia = janela.count(peca_ia)
+    count_humano = janela.count(peca_humano)
+    count_vazio = janela.count(" ")
+
+    if count_ia > 0 and count_humano > 0:
+        return 0
+
+    if count_ia == 4:
+        score += 1000
+    elif count_ia == 3 and count_vazio == 1:
+        score += 100
+        if janela[1] == peca_ia and janela[2] == peca_ia:
+            score += 50
+    elif count_ia == 2 and count_vazio == 2:
+        score += 20
+        if janela[0] == " " and janela[3] == " ":
+            score += 30
+        if janela[1] == peca_ia and janela[2] == peca_ia:
+            score += 15
+
+    if count_humano == 4:
+        score -= 1000
+    elif count_humano == 3 and count_vazio == 1:
+        score -= 200
+    elif count_humano == 2 and count_vazio == 2:
+        if janela[0] == " " and janela[3] == " ":
+            score -= 40
+        else:
+            score -= 15
+
+    return score
+
 
 def pontuacao_tabuleiro(tabuleiro, peca_ia, funcao_avaliacao):
     score = 0
@@ -99,38 +134,40 @@ def pontuacao_tabuleiro(tabuleiro, peca_ia, funcao_avaliacao):
     for l in range(linhas_t):
         for c in range(colunas_t - 3):
             janela = [tabuleiro[l, c + i] for i in range(4)]
-            score += funcao_avaliacao( janela, peca_ia)
+            score += funcao_avaliacao(janela, peca_ia)
 
     # Vertical
     for l in range(linhas_t - 3):
         for c in range(colunas_t):
             janela = [tabuleiro[l + i, c] for i in range(4)]
-            score += funcao_avaliacao( janela, peca_ia)
+            score += funcao_avaliacao(janela, peca_ia)
 
     # Diagonal \
     for l in range(linhas_t - 3):
         for c in range(colunas_t - 3):
             janela = [tabuleiro[l + i, c + i] for i in range(4)]
-            score += funcao_avaliacao( janela, peca_ia)
+            score += funcao_avaliacao(janela, peca_ia)
 
     # Diagonal /
     for l in range(3, linhas_t):
         for c in range(colunas_t - 3):
             janela = [tabuleiro[l - i, c + i] for i in range(4)]
-            score += funcao_avaliacao( janela, peca_ia)
+            score += funcao_avaliacao(janela, peca_ia)
 
     return score
 
 
 def max_value(tabuleiro, depth, max_depth, peca_ia, heuristica):
-    #condição de parada da recursão: vit/empara e profundidade max
+    # condição de parada da recursão: vit/empara e profundidade max
     if checar_fim(tabuleiro) or depth == max_depth:
         return pontuacao_tabuleiro(tabuleiro, peca_ia, heuristica)
 
     valor = -np.inf
     for col in movimentos_validos(tabuleiro):
         novo_tabuleiro = simular_jogada(tabuleiro, col, peca_ia)
-        valor = max(valor, min_value(novo_tabuleiro, depth + 1, max_depth, peca_ia, heuristica))
+        valor = max(
+            valor, min_value(novo_tabuleiro, depth + 1, max_depth, peca_ia, heuristica)
+        )
     return valor
 
 
@@ -138,11 +175,13 @@ def min_value(tabuleiro, depth, max_depth, peca_ia, heuristica):
     if checar_fim(tabuleiro) or depth == max_depth:
         return pontuacao_tabuleiro(tabuleiro, peca_ia, heuristica)
 
-    peca_humano = 'X' if peca_ia == '0' else '0'
+    peca_humano = "X" if peca_ia == "0" else "0"
     valor = np.inf
     for col in movimentos_validos(tabuleiro):
         novo_tabuleiro = simular_jogada(tabuleiro, col, peca_humano)
-        valor = min(valor, max_value(novo_tabuleiro, depth + 1, max_depth, peca_ia, heuristica))
+        valor = min(
+            valor, max_value(novo_tabuleiro, depth + 1, max_depth, peca_ia, heuristica)
+        )
     return valor
 
 
