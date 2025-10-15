@@ -1,7 +1,7 @@
 import numpy as np
 import random
 from ia import *
-
+import time
 # classe principal do jogo
 class Jogo:
     def __init__(self):
@@ -183,6 +183,8 @@ class Jogo:
                     fim_de_jogo = True
 
             else:
+                print("IA está pensando...")
+                start_time = time.time() 
                 coluna, valor = minimax(
                     self.tabuleiro,
                     depth=1,
@@ -190,11 +192,15 @@ class Jogo:
                     peca_ia="0",
                     heuristica=dificuldade_escolhida,
                 )
-                print(f"Melhor coluna: {coluna}, Valor: {valor}")
-                self.colocar_peca(
-                    self.proxima_linha_disponivel(coluna), coluna, self.posicao_amarela
-                )
-
+                tempo = time.time() - start_time
+                if coluna is not None:
+                    self.colocar_peca(
+                        self.proxima_linha_disponivel(coluna), coluna, self.posicao_amarela
+                    )
+                score_do_estado_atual = pontuacao_tabuleiro(self.tabuleiro, self.posicao_amarela, dificuldade_escolhida)
+                print("--- Jogada da IA Concluída ---")
+                print(f"Tempo Gasto na Jogada: {tempo:.4f} segundos")
+                print(f"Valor da Heurística para o Tabuleiro Atual: {score_do_estado_atual}")
                 if self.checar_vitoria(self.posicao_amarela):
                     self.mostrar_tabuleiro()
                     resultado = "Jogador Amarelo venceu!"

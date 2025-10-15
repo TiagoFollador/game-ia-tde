@@ -68,9 +68,9 @@ def avaliar_janela_iniciante(janela, peca_ia):
     score = 0
     peca_humano = "X" if peca_ia == "0" else "0"
 
-    if janela.count(peca_ia) == 3 and janela.count(" ") == 1:
+    if janela.count(peca_ia) == 3 and janela.count(" ") == 1:#
         score += 1
-    if janela.count(peca_humano) == 3 and janela.count(" ") == 1:
+    if janela.count(peca_humano) == 3 and janela.count(" ") == 1:#
         score -= 10
     return score
 
