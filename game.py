@@ -146,15 +146,18 @@ class Jogo:
         if dificuldade == 1:
             dificuldade_escolhida = avaliar_janela_iniciante
             profundidade_max = 2
+            simples = True
         elif dificuldade == 2:
             dificuldade_escolhida = avaliar_janela_intermediaria
             profundidade_max = 4
+            simples = False
         elif dificuldade == 3:
             dificuldade_escolhida = avaliar_janela_avancada
             profundidade_max = 6
         else:
             dificuldade_escolhida = avaliar_janela_iniciante
             profundidade_max = 2
+            simples = False
 
         self.mostrar_tabuleiro()
 
@@ -191,6 +194,7 @@ class Jogo:
                     max_depth=profundidade_max,
                     peca_ia="0",
                     heuristica=dificuldade_escolhida,
+                    simples=simples
                 )
                 tempo = time.time() - start_time
                 if coluna is not None:
@@ -216,7 +220,6 @@ class Jogo:
 # funcao principal pra iniciar o jogo
 def jogar():
     jogo = Jogo()
-    tabuleiro = jogo.tabuleiro
 
     print("Modos de jogo:\n1 - Player vs Player\n2 - Player vs Máquina")
 

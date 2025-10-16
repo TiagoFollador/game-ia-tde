@@ -161,7 +161,7 @@ def pontuacao_tabuleiro(tabuleiro, peca_ia, funcao_avaliacao):
     return score
 
 # parte max do minimax, tenta maximizar o valor da ia
-def max_value(tabuleiro, depth, max_depth, peca_ia, heuristica):
+def valor_max(tabuleiro, depth, max_depth, peca_ia, heuristica, alpha, beta):
     peca_humano = "X" if peca_ia == "0" else "0"
     if checar_vitoria(tabuleiro, peca_ia): 
         return 1000000 
@@ -174,12 +174,18 @@ def max_value(tabuleiro, depth, max_depth, peca_ia, heuristica):
     for col in movimentos_validos(tabuleiro):
         novo_tabuleiro = simular_jogada(tabuleiro, col, peca_ia)
         valor = max(
-            valor, min_value(novo_tabuleiro, depth + 1, max_depth, peca_ia, heuristica)
+            valor, valor_min(novo_tabuleiro, depth + 1, max_depth, peca_ia, heuristica, alpha, beta)
         )
+        #para a heuristica simples não passar
+        if alpha is not None:
+            alpha = max(alpha, valor)
+            if alpha >= beta:  # poda
+                break
+
     return valor
 
 # parte min do minimax, tenta minimizar o valor pro humano, e minimizar pra ia
-def min_value(tabuleiro, depth, max_depth, peca_ia, heuristica):
+def valor_min(tabuleiro, depth, max_depth, peca_ia, heuristica, alpha, beta):
     peca_humano = "X" if peca_ia == "0" else "0"
     if checar_vitoria(tabuleiro, peca_ia): 
         return 1000000
@@ -188,25 +194,39 @@ def min_value(tabuleiro, depth, max_depth, peca_ia, heuristica):
     if checar_fim(tabuleiro) or depth == max_depth:
         return pontuacao_tabuleiro(tabuleiro, peca_ia, heuristica)
 
-    
     valor = np.inf
     for col in movimentos_validos(tabuleiro):
         novo_tabuleiro = simular_jogada(tabuleiro, col, peca_humano)
         valor = min(
-            valor, max_value(novo_tabuleiro, depth + 1, max_depth, peca_ia, heuristica)
+            valor, valor_max(novo_tabuleiro, depth + 1, max_depth, peca_ia, heuristica, alpha, beta)
         )
+        #para a heuristica simples não passar
+        if alpha is not None:
+            beta = min(beta, valor)
+            if alpha >= beta:
+                break
     return valor
 
 # algoritmo minimax pra achar a melhor jogada
-def minimax(tabuleiro, depth, max_depth, peca_ia, heuristica):
+def minimax(tabuleiro, depth, max_depth, peca_ia, heuristica, simples=False):
     melhor_valor = -np.inf
     melhor_coluna = None
+    alpha = -np.inf
+    beta = np.inf
+
+    if simples:
+        alpha = None
+        beta = None
 
     for col in movimentos_validos(tabuleiro):
         novo_tabuleiro = simular_jogada(tabuleiro, col, peca_ia)
-        valor = min_value(novo_tabuleiro, depth + 1, max_depth, peca_ia, heuristica)
+        valor = valor_min(novo_tabuleiro, depth + 1, max_depth, peca_ia, heuristica, alpha, beta)
         if valor > melhor_valor:
             melhor_valor = valor
             melhor_coluna = col
+
+        #verifica se está no simples ou não
+        if alpha is not None:
+            alpha = max(alpha, melhor_valor)
 
     return melhor_coluna, melhor_valor
